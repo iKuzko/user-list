@@ -3,17 +3,17 @@
 </header>
 
 
-<form>
+<form [formGroup]="userProfileFormReactive">
   <div class="row mb-4">
     <div class="col d-flex gap-4">
-      <button type="button" class="btn btn-primary" [routerLink]="['/user/']">
+      <button type="button" class="btn btn-primary" (click)="navigateToUserList()">
         Back to list
       </button>
       <!-- Update User Profile -->
-      @if (userProfileModel().name) {
+      @if (userProfileFormReactive.get('name')?.value) {
         <button type="submit" class="btn btn-primary"
                 (click)="updateUserProfile($event)"
-                [disabled]="userProfileForm().invalid() || userProfileForm().pending()">
+                [disabled]="!userProfileFormReactive.valid">
           Save Changes
         </button>
       } @else {
@@ -25,23 +25,28 @@
     </div>
   </div>
 
-@if (userProfileModel().name) {
+@if (userProfileFormReactive.get('name')?.value) {
   <div class="mb-3">
     <label for="userName" class="form-label">User Name</label>
     <input type="text"
            class="form-control"
            id="userName"
-           [formField]="userProfileForm.name">
-    @if (userProfileForm.name().invalid() && userProfileForm.name().touched()) {
+           formControlName="name">
+    @let name = userProfileFormReactive.get('name')!;
+    @if (name.invalid && (name.dirty || name.touched)) {
       <div class="validation-message invalid">
-        @for( error of userProfileForm.name().errors(); track error.kind) {
-          <div>{{error.message}}</div>
+        @if (name.hasError('required')) {
+          <div>Name is required</div>
         }
-      </div>
-    }
-    @if (userProfileForm.name().pending()) {
-      <div class="validation-message">
-        Checking availability...
+        @if (name.hasError('maxLength')) {
+          <div>Max length is 100</div>
+        }
+        @if (name.hasError('pattern')) {
+          <div>Invalid name</div>
+        }
+        @if (name.hasError('nameNotUnique')) {
+          <div>Name must be unique. This name is already taken</div>
+        }
       </div>
     }
   </div>
@@ -50,43 +55,48 @@
     <input type="email"
            class="form-control"
            id="primaryEmail"
-           [formField]="userProfileForm.primaryEmail">
-    @if (userProfileForm.primaryEmail().invalid() && userProfileForm.primaryEmail().touched()) {
+           formControlName="primaryEmail">
+    @let primaryEmail = userProfileFormReactive.get('primaryEmail')!;
+    @if (primaryEmail.invalid && (primaryEmail.dirty || primaryEmail.touched)) {
       <div class="validation-message invalid">
-        @for( error of userProfileForm.primaryEmail().errors(); track error.kind) {
-          <div>{{error.message}}</div>
+        @if (primaryEmail.hasError('required')) {
+          <div>Primary Email is required</div>
+        }
+        @if (primaryEmail.hasError('email')) {
+          <div>Please enter valid email address</div>
         }
       </div>
     }
   </div>
 
-    @for (additionalEmail of userProfileModel().additionalEmails; track $index;) {
-      @let emailField = userProfileForm.additionalEmails[$index];
-      <div class="mb-3">
-        @if ($index === 0) {
-          <label for="additionalEmail0" class="form-label">Additional Email</label>
-        }
-        <div class="input-group">
-          <input type="email"
-                 class="form-control"
-                 placeholder="Additional Email"
-                 aria-label="Additional Email"
-                 [id]="'additionalEmail'+ $index"
-                 [formField]="emailField">
-          <button class="btn btn-outline-secondary"
-                  type="button"
-                  (click)="removeAdditionalEmail($index)"
-          >Remove</button>
-        </div>
-        @if (emailField().invalid() && emailField().touched()) {
-          <div class="validation-message invalid">
-            @for( error of emailField().errors(); track error.kind) {
-              <div>{{error.message}}</div>
-            }
-          </div>
-        }
+  @for (additionalEmail of additionalEmails.controls; track $index) {
+    <div class="mb-3">
+      @if ($index === 0) {
+        <label for="additionalEmail0" class="form-label">Additional Email</label>
+      }
+      <div class="input-group">
+        <input type="email"
+               class="form-control"
+               placeholder="Additional Email"
+               aria-label="Additional Email"
+               [id]="'additionalEmail'+ $index"
+               [formControl]="additionalEmail">
+        <button class="btn btn-outline-secondary"
+                type="button"
+                (click)="removeAdditionalEmail($index)"
+        >Remove</button>
       </div>
-    }
+
+      @if (additionalEmail.invalid && (additionalEmail.dirty || additionalEmail.touched)) {
+        <div class="validation-message invalid">
+          @if (additionalEmail.hasError('email')) {
+            <div>Please enter valid email address</div>
+          }
+        </div>
+      }
+    </div>
+  }
+
     <button class="btn btn-primary mb-3"
             type="button"
             title="Add new Email"
