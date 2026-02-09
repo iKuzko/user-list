@@ -1,0 +1,18 @@
+.validation-message {
+  width: 100%;
+  margin-top: .25rem;
+  font-size: .875em;
+}
+
+.invalid {
+  color: var(--bs-form-invalid-color);
+}
+
+.placeholder {
+  &-label {
+    height: 1.5rem;
+  }
+  &-input {
+    height: 2rem;
+  }
+}

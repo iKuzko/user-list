@@ -1,0 +1,119 @@
+<header class="pb-3 mb-4 border-bottom">
+  <span class="fs-4 fw-bold">Edit User Profile</span>
+</header>
+
+
+<form>
+  <div class="row mb-4">
+    <div class="col d-flex gap-4">
+      <button type="button" class="btn btn-primary" [routerLink]="['/user/']">
+        Back to list
+      </button>
+      <!-- Update User Profile -->
+      @if (userProfileModel().name) {
+        <button type="submit" class="btn btn-primary"
+                (click)="updateUserProfile($event)"
+                [disabled]="userProfileForm().invalid() || userProfileForm().pending()">
+          Save Changes
+        </button>
+      } @else {
+        <button class="btn btn-primary disabled placeholder col-1"
+                aria-disabled="true"
+                type="button"
+        ></button>
+      }
+    </div>
+  </div>
+
+@if (userProfileModel().name) {
+  <div class="mb-3">
+    <label for="userName" class="form-label">User Name</label>
+    <input type="text"
+           class="form-control"
+           id="userName"
+           [formField]="userProfileForm.name">
+    @if (userProfileForm.name().invalid() && userProfileForm.name().touched()) {
+      <div class="validation-message invalid">
+        @for( error of userProfileForm.name().errors(); track error.kind) {
+          <div>{{error.message}}</div>
+        }
+      </div>
+    }
+    @if (userProfileForm.name().pending()) {
+      <div class="validation-message">
+        Checking availability...
+      </div>
+    }
+  </div>
+  <div class="mb-3">
+    <label for="primaryEmail" class="form-label">Primary Email</label>
+    <input type="email"
+           class="form-control"
+           id="primaryEmail"
+           [formField]="userProfileForm.primaryEmail">
+    @if (userProfileForm.primaryEmail().invalid() && userProfileForm.primaryEmail().touched()) {
+      <div class="validation-message invalid">
+        @for( error of userProfileForm.primaryEmail().errors(); track error.kind) {
+          <div>{{error.message}}</div>
+        }
+      </div>
+    }
+  </div>
+
+    @for (additionalEmail of userProfileModel().additionalEmails; track $index;) {
+      @let emailField = userProfileForm.additionalEmails[$index];
+      <div class="mb-3">
+        @if ($index === 0) {
+          <label for="additionalEmail0" class="form-label">Additional Email</label>
+        }
+        <div class="input-group">
+          <input type="email"
+                 class="form-control"
+                 placeholder="Additional Email"
+                 aria-label="Additional Email"
+                 [id]="'additionalEmail'+ $index"
+                 [formField]="emailField">
+          <button class="btn btn-outline-secondary"
+                  type="button"
+                  (click)="removeAdditionalEmail($index)"
+          >Remove</button>
+        </div>
+        @if (emailField().invalid() && emailField().touched()) {
+          <div class="validation-message invalid">
+            @for( error of emailField().errors(); track error.kind) {
+              <div>{{error.message}}</div>
+            }
+          </div>
+        }
+      </div>
+    }
+    <button class="btn btn-primary mb-3"
+            type="button"
+            title="Add new Email"
+            aria-label="Add new Email"
+            (click)="addAdditionalEmail()"
+    >+ Add Email</button>
+} @else {
+  <div class="placeholder-glow">
+    <p class="placeholder col-1 placeholder-label"></p>
+  </div>
+  <div class="placeholder-glow">
+    <p class="placeholder col-8 placeholder-input"></p>
+  </div>
+  <div class="placeholder-glow">
+    <p class="placeholder col-1 placeholder-label"></p>
+  </div>
+  <div class="placeholder-glow">
+    <p class="placeholder col-8 placeholder-input"></p>
+  </div><div class="placeholder-glow">
+    <p class="placeholder col-1 placeholder-label"></p>
+  </div>
+  <div class="placeholder-glow">
+    <p class="placeholder col-8 placeholder-input"></p>
+  </div>
+  <button class="btn btn-primary disabled placeholder col-2"
+          aria-disabled="true"
+          type="button"
+  ></button>
+}
+</form>
