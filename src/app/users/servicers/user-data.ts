@@ -1,5 +1,4 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
 import {User} from '../models/user';
 import {Observable} from 'rxjs';
 import {UserApiService} from './user-api';
@@ -28,13 +27,8 @@ export class UserService {
     return this.userApiService.updateUser(user);
   }
 
-
-  //
-  // createUser(user: User): Observable<User> {
-  //   return this.http.post<User>(`/api/user`, user);
-  // }
-
-
-
+  createUser(user: User): Observable<User> {
+    return this.userApiService.createUser(user);
+  }
 
 }

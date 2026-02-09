@@ -10,7 +10,7 @@
         Back to list
       </button>
       <!-- Update User Profile -->
-      @if (userProfileFormReactive.get('name')?.value) {
+      @if (userProfileFormReactive.get('id')?.value) {
         <button type="submit" class="btn btn-primary"
                 (click)="updateUserProfile($event)"
                 [disabled]="!userProfileFormReactive.valid">
@@ -25,7 +25,7 @@
     </div>
   </div>
 
-@if (userProfileFormReactive.get('name')?.value) {
+@if (userProfileFormReactive.get('id')?.value) {
   <div class="mb-3">
     <label for="userName" class="form-label">User Name</label>
     <input type="text"
@@ -127,3 +127,11 @@
   ></button>
 }
 </form>
+
+<ng-template #confirmTemplate>
+  <div class="modal-body text-center">
+    <p>Do you want to discard unsaved changes?</p>
+    <button type="button" class="btn btn-default" (click)="confirm()" >Yes</button>
+    <button type="button" class="btn btn-primary" (click)="decline()" >No</button>
+  </div>
+</ng-template>

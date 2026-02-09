@@ -4,55 +4,47 @@ import {
   effect,
   inject,
   input,
-  InputSignal,
-  signal,
+  InputSignal, TemplateRef, ViewChild,
 } from '@angular/core';
 import {User} from '../../models/user';
 import {UserService} from '../../servicers/user-data';
-import {
-  applyEach,
-  email,
-  form,
-  FormField,
-  maxLength, pattern,
-  required,
-  schema,
-} from '@angular/forms/signals';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 import {HttpErrorResponse} from '@angular/common/http';
 import {FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
-import {catchError} from 'rxjs';
+import {catchError, EMPTY, Observable, of, Subject} from 'rxjs';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'user-info',
   imports: [
     ReactiveFormsModule,
   ],
+  providers: [
+    BsModalService
+  ],
   templateUrl: './user-profile.html',
-  styleUrl: './user-profile.scss',
+  styles: `
+    .placeholder {
+      &-label {
+        height: 1.5rem;
+      }
+      &-input {
+        height: 2rem;
+      }
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserProfile {
   readonly id: InputSignal<string> = input.required();
   private userService = inject(UserService);
-  private initialFormData: User = {id: -1, name: '', primaryEmail: '', additionalEmails: []};
-  private userProfileSchema = schema<User>((root) => {
-    required(root.name, {message: 'Name is required'});
-    maxLength(root.name, 100, {message: 'Max length is 100'});
-    pattern(root.name, /^[a-zA-Z0-9 -]*$/, {message: 'Invalid name'});
-    required(root.primaryEmail, {message: 'Primary Email is required'});
-    email(root.primaryEmail, { message: 'Please enter valid email address'});
-    applyEach(root.additionalEmails, (emailPath) => {
-      email(emailPath, { message: 'Please enter valid email address'})
-    });
-  });
-
-
-  userProfileModel = signal<User>(this.initialFormData);
-  userProfileForm = form<User>(this.userProfileModel, this.userProfileSchema);
-
+  private modalService = inject(BsModalService);
   private fb = inject(FormBuilder);
-  router = inject(Router);
+  private router = inject(Router);
+  public bsModalRef = inject(BsModalRef);
+  private confirmationSubject = new Subject<boolean>();
+
+  @ViewChild('confirmTemplate') confirmModal!: TemplateRef<any>;
 
   userProfileFormReactive = this.fb.group({
     id: [0],
@@ -72,19 +64,11 @@ export class UserProfile {
   constructor() {
     effect(() => {
       this.userService.getUser(this.id()).subscribe(result => {
-        this.userProfileModel.set(result as User)
-        // result.additionalEmails.forEach(email => this.additionalEmails.push(this.fb.control(email, [Validators.email])));
-        result.additionalEmails.forEach(email => this.addAdditionalEmail());
+        result.additionalEmails.forEach(() => this.addAdditionalEmail());
         this.userProfileFormReactive.patchValue(result);
-      }, (error: HttpErrorResponse) => {
-        console.error(error);
       })
     });
   }
-
-  ngOnInit(): void {
-  }
-
 
   protected removeAdditionalEmail($index: number) {
     this.additionalEmails.removeAt($index);
@@ -104,11 +88,9 @@ export class UserProfile {
           nameField.setErrors({'nameNotUnique': true});
           nameField.markAsTouched();
         }
-        return error.error;
+        return EMPTY
       }))
-      .subscribe(result => {
-        this.navigateToUserList();
-      })
+      .subscribe(() => this.navigateToUserList())
 
   }
 
@@ -116,4 +98,21 @@ export class UserProfile {
     return this.router.navigate(['/users']);
   }
 
+  canDeactivate(): Observable<boolean> {
+    if (this.userProfileFormReactive.pristine) {
+      return of(true);
+    }
+    this.bsModalRef = this.modalService.show(this.confirmModal);
+    return this.confirmationSubject.asObservable();
+  }
+
+  protected confirm() {
+    this.confirmationSubject.next(true);
+    this.bsModalRef.hide()
+  }
+
+  protected decline() {
+    this.confirmationSubject.next(false);
+    this.bsModalRef.hide()
+  }
 }

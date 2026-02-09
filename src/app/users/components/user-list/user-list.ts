@@ -1,22 +1,26 @@
 import {Component, inject, WritableSignal} from '@angular/core';
-import {Observable} from 'rxjs';
 import {User} from '../../models/user';
 import {UserService} from '../../servicers/user-data';
-import {AsyncPipe} from '@angular/common';
 import {RouterLink} from '@angular/router';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import {UserCreate} from '../user-create/user-create';
 
 @Component({
   selector: 'user-list',
   imports: [
     RouterLink
   ],
+  providers: [
+    BsModalService
+  ],
   templateUrl: './user-list.html',
-  styleUrl: './user-list.scss',
 })
 export class UserList {
   users: WritableSignal<User[]>;
+  bsModalRef?: BsModalRef;
 
   private userService = inject(UserService);
+  private modalService = inject(BsModalService);
 
   constructor() {
     this.users = this.userService.userList;
@@ -25,5 +29,9 @@ export class UserList {
 
   public deleteUser(id: number) {
     this.userService.deleteUser(id);
+  }
+
+  public createUser() {
+    this.bsModalRef = this.modalService.show(UserCreate);
   }
 }

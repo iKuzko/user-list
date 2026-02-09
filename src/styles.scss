@@ -24,3 +24,13 @@ a:hover {
   color: #23527c;
   text-decoration: underline;
 }
+
+.validation-message {
+  width: 100%;
+  margin-top: .25rem;
+  font-size: .875em;
+}
+
+.invalid {
+  color: var(--bs-form-invalid-color);
+}
