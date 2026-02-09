@@ -1,1 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  --main-bg-color: #e9ecef;
+  --container-bg-color: #fcfcfc;
+  --link-color: #337ab7;
+}
+
+body {
+  background-color: var(--main-bg-color);
+  padding-top: 50px;
+}
+
+.container {
+  background-color: var(--container-bg-color);
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: #23527c;
+  text-decoration: underline;
+}
