@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { UserProfile } from './users/components/user-info/user-profile';
-import {UserList} from './users/components/user-list/user-list';
+import { UserList } from './users/components/user-list/user-list';
+import { canDeactivateGuard } from './users/guards/can-deactivate';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'users', pathMatch: 'full' },
@@ -8,7 +9,7 @@ export const routes: Routes = [
   {
     path: 'user/:id',
     component: UserProfile,
-    canDeactivate: [(component: UserProfile) => component.canDeactivate()],
+    canDeactivate: [canDeactivateGuard],
   },
   { path: '**', redirectTo: 'user' },
 ];

@@ -13,7 +13,7 @@
       @if (userProfileFormReactive.get('id')?.value) {
         <button type="submit" class="btn btn-primary"
                 (click)="updateUserProfile($event)"
-                [disabled]="!userProfileFormReactive.valid">
+                [disabled]="isSameUserData() || !userProfileFormReactive.valid">
           Save Changes
         </button>
       } @else {
