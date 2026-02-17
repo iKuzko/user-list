@@ -18,15 +18,15 @@
 @if (users().length) {
   @for (user of users(); track user.id) {
     <div class="row mb-2 p-3 bg-tertiary-subtle border border-tertiary-subtle rounded-3 shadow-sm">
-      <div class="col-4">
+      <div class="col-11 col-sm-4 order-1 text-truncate">
         <a [routerLink]="['/user/', user.id]" class="text-edin-500">
           {{ user.name }}
         </a>
       </div>
-      <div class="col">
+      <div class="col order-3 order-sm-2 text-truncate">
         {{ user.primaryEmail }}
       </div>
-      <div class="col-1 text-end">
+      <div class="col-1 text-end order-2 order-sm-3">
         <button type="button" class="btn-close" aria-label="Delete User Profile" (click)="deleteUser(user)"></button>
       </div>
     </div>
