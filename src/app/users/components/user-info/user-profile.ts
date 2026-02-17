@@ -14,7 +14,7 @@ import {Router} from '@angular/router';
 import {HttpErrorResponse} from '@angular/common/http';
 import {FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import {catchError, EMPTY, tap} from 'rxjs';
-import {isEqual} from 'lodash';
+import {isEqual} from 'lodash-es';
 import {CanComponentDeactivate} from '../../guards/can-deactivate';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Confirmation} from '../confirmation/confirmation';
