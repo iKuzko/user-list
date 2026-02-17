@@ -4,8 +4,8 @@ import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {User} from '../../models/user';
 import {catchError, EMPTY} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
-import {BsModalRef} from 'ngx-bootstrap/modal';
 import {NgClass} from '@angular/common';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'user-create',
@@ -16,7 +16,7 @@ import {NgClass} from '@angular/common';
   template: `
     <div class="modal-header">
       <h4 class="modal-title fs-5" id="exampleModalLabel">Add New User</h4>
-      <button type="button" class="btn-close" aria-label="Close" (click)="bsModalRef.hide()"></button>
+      <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
     </div>
     <div class="modal-body">
       <form [formGroup]="createUserProfileForm">
@@ -70,20 +70,17 @@ import {NgClass} from '@angular/common';
       </form>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="bsModalRef.hide()">Close</button>
+      <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">Close</button>
       <button type="button" class="btn btn-primary"
               (click)="createUserProfile()"
               [disabled]="!createUserProfileForm.valid">Create</button>
     </div>
   `,
-  styles: `
-
-  `
 })
 export class UserCreate {
   private userService = inject(UserService);
   private fb = inject(FormBuilder);
-  public bsModalRef = inject(BsModalRef);
+  activeModal = inject(NgbActiveModal);
 
   createUserProfileForm = this.fb.group({
     name: ['', [
@@ -108,7 +105,7 @@ export class UserCreate {
       }))
       .subscribe(() => {
         this.userService.loadUserList()
-        this.bsModalRef.hide();
+        this.activeModal.close();
       })
 
   }

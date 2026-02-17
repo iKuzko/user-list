@@ -4,25 +4,25 @@ import {
   effect,
   inject,
   input,
-  InputSignal, OnDestroy, signal, TemplateRef, ViewChild,
+  InputSignal,
+  OnDestroy,
+  signal,
 } from '@angular/core';
 import {User} from '../../models/user';
 import {UserService} from '../../servicers/user-data';
-import { Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {HttpErrorResponse} from '@angular/common/http';
 import {FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
-import {catchError, EMPTY, Observable, of, Subject, tap} from 'rxjs';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
-import { isEqual } from 'lodash';
+import {catchError, EMPTY, tap} from 'rxjs';
+import {isEqual} from 'lodash';
 import {CanComponentDeactivate} from '../../guards/can-deactivate';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Confirmation} from '../confirmation/confirmation';
 
 @Component({
   selector: 'user-info',
   imports: [
     ReactiveFormsModule,
-  ],
-  providers: [
-    BsModalService
   ],
   templateUrl: './user-profile.html',
   styles: `
@@ -40,15 +40,11 @@ import {CanComponentDeactivate} from '../../guards/can-deactivate';
 export class UserProfile implements OnDestroy, CanComponentDeactivate {
   readonly id: InputSignal<string> = input.required();
   private userService = inject(UserService);
-  private modalService = inject(BsModalService);
+  private modalService = inject(NgbModal);
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private confirmationSubject = new Subject<boolean>();
   private initialUser: User | undefined;
   public isSameUserData = signal(true);
-  public bsModalRef = inject(BsModalRef);
-
-  @ViewChild('confirmTemplate') confirmModal!: TemplateRef<any>;
 
   userProfileFormReactive = this.fb.group({
     id: [0],
@@ -122,21 +118,14 @@ export class UserProfile implements OnDestroy, CanComponentDeactivate {
     this.isSameUserData.set(isEqual(this.initialUser, this.getUserDataForSave()));
   }
 
-  public canDeactivate(): Observable<boolean> {
+  public canDeactivate(): Promise<boolean> {
     if (this.isSameUserData()) {
-      return of(true);
+      return Promise.resolve(true);
     }
-    this.bsModalRef = this.modalService.show(this.confirmModal);
-    return this.confirmationSubject.asObservable();
-  }
+    let modal = this.modalService.open(Confirmation);
+    modal.componentInstance.title = 'Unsaved changes!';
+    modal.componentInstance.body = 'Do you want to discard all unsaved changes?';
 
-  protected confirm() {
-    this.confirmationSubject.next(true);
-    this.bsModalRef.hide()
-  }
-
-  protected decline() {
-    this.confirmationSubject.next(false);
-    this.bsModalRef.hide()
+    return modal.result.then(()=>true, () => false);
   }
 }

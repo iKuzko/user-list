@@ -1,11 +1,13 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {User} from '../models/user';
-import {Observable} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import {UserApiService} from './user-api';
+import {ToastService} from './toast';
 
 @Injectable({providedIn: 'root'})
 export class UserService {
   private userApiService = inject(UserApiService);
+  private toastService = inject(ToastService);
 
   public userList = signal<User[]>([]);
 
@@ -14,9 +16,13 @@ export class UserService {
   }
 
   deleteUser(id: number): void {
-    this.userApiService.deleteUser(id).subscribe(()=>{
-      this.loadUserList();
-    });
+    this.userApiService.deleteUser(id)
+      .pipe(
+        tap(() => this.toastService.show({message: 'User profile was deleted', classname: 'bg-danger text-light'})),
+      )
+      .subscribe(()=> {
+        this.loadUserList();
+      });
   }
 
   getUser(id: string): Observable<User> {
@@ -24,11 +30,15 @@ export class UserService {
   }
 
   updateUser(user: User): Observable<User> {
-    return this.userApiService.updateUser(user);
+    return this.userApiService.updateUser(user).pipe(
+      tap(() => this.toastService.show({message: 'User profile updated', classname: 'bg-success text-light'})),
+    );
   }
 
   createUser(user: User): Observable<User> {
-    return this.userApiService.createUser(user);
+    return this.userApiService.createUser(user).pipe(
+      tap(() => this.toastService.show({message: 'User profile created', classname: 'bg-success text-light'})),
+    );
   }
 
 }

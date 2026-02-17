@@ -103,35 +103,5 @@
             aria-label="Add new Email"
             (click)="addAdditionalEmail()"
     >+ Add Email</button>
-} @else {
-  <div class="placeholder-glow">
-    <p class="placeholder col-1 placeholder-label"></p>
-  </div>
-  <div class="placeholder-glow">
-    <p class="placeholder col-8 placeholder-input"></p>
-  </div>
-  <div class="placeholder-glow">
-    <p class="placeholder col-1 placeholder-label"></p>
-  </div>
-  <div class="placeholder-glow">
-    <p class="placeholder col-8 placeholder-input"></p>
-  </div><div class="placeholder-glow">
-    <p class="placeholder col-1 placeholder-label"></p>
-  </div>
-  <div class="placeholder-glow">
-    <p class="placeholder col-8 placeholder-input"></p>
-  </div>
-  <button class="btn btn-primary disabled placeholder col-2"
-          aria-disabled="true"
-          type="button"
-  ></button>
 }
 </form>
-
-<ng-template #confirmTemplate>
-  <div class="modal-body text-center">
-    <p>Do you want to discard unsaved changes?</p>
-    <button type="button" class="btn btn-default" (click)="confirm()" >Yes</button>
-    <button type="button" class="btn btn-primary" (click)="decline()" >No</button>
-  </div>
-</ng-template>
